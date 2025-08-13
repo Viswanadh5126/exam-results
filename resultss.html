@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results Portal - BCA 4th Semester</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 420px;
+            text-align: center;
+        }
+        h2 { margin-bottom: 5px; color: #333; }
+        h4 { margin-bottom: 5px; color: #555; }
+        h5 { margin-bottom: 20px; color: #777; font-weight: normal; }
+        input {
+            width: 90%; padding: 10px; margin: 10px 0;
+            border: 1px solid #ccc; border-radius: 6px; font-size: 16px;
+        }
+        button {
+            background-color: #4CAF50; color: white; border: none;
+            padding: 12px 20px; border-radius: 6px; cursor: pointer;
+            font-size: 16px; margin-top: 10px;
+        }
+        button:hover { background-color: #45a049; }
+        table {
+            width: 100%; margin-top: 10px; border-collapse: collapse;
+        }
+        th, td { padding: 8px; border: 1px solid #ddd; }
+        th { background-color: #f2f2f2; }
+        .result-box {
+            margin-top: 20px; padding: 15px; border-radius: 8px;
+            background-color: #f9f9f9; display: none; text-align: left;
+        }
+        .pass { color: green; font-weight: bold; }
+        .fail { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>BCA</h2>
+    <h4>Fourth Semester</h4>
+    <h5>Exam Results</h5>
+    <input type="text" id="hallTicket" placeholder="Enter Hall Ticket Number">
+    <button onclick="checkResult()">Get Result</button>
+    <div class="result-box" id="resultBox"></div>
+</div>
+
+<script>
+    const studentData = {
+        "230377401004": { name: "Siva", subjects: { "AWS": 60, "Python": 65, "DMDW": 70, "Mobile Applications Development": 68, "Operating System": 62 }, status: "Pass" },
+        "230377401025": { name: "Sandeep Batte", subjects: { "AWS": 72, "Python": 74, "DMDW": 70, "Mobile Applications Development": 76, "Operating System": 72 }, status: "Pass" },
+        "230377401046": { name: "Nani", subjects: { "AWS": 85, "Python": 88, "DMDW": 82, "Mobile Applications Development": 84, "Operating System": 80 }, status: "Pass" },
+        "230377401057": { name: "Sudheer", subjects: { "AWS": 55, "Python": 50, "DMDW": 60, "Mobile Applications Development": 58, "Operating System": 54 }, status: "Pass" },
+        "230377401064": { name: "Satya Sai Akhil", subjects: { "AWS": 78, "Python": 82, "DMDW": 75, "Mobile Applications Development": 80, "Operating System": 77 }, status: "Pass" },
+        "230377401074": { name: "Bhadra", subjects: { "AWS": 65, "Python": 72, "DMDW": 68, "Mobile Applications Development": 80, "Operating System": 75 }, status: "Pass" },
+        "230377401090": { name: "ValliBaba", subjects: { "AWS": 75, "Python": 70, "DMDW": 68, "Mobile Applications Development": 72, "Operating System": 74 }, status: "Pass" },
+        "230377401091": { name: "Abhiram", subjects: { "AWS": 50, "Python": 55, "DMDW": 58, "Mobile Applications Development": 60, "Operating System": 62 }, status: "Pass" },
+        "230377401128": { name: "Vamsi", subjects: { "AWS": 78, "Python": 80, "DMDW": 75, "Mobile Applications Development": 85, "Operating System": 82 }, status: "Pass" },
+        "230377401130": { name: "Karthik Sangamesh", subjects: { "AWS": 80, "Python": 78, "DMDW": 82, "Mobile Applications Development": 85, "Operating System": 81 }, status: "Pass" },
+        "230377401131": { name: "Chitti Suneel", subjects: { "AWS": 65, "Python": 70, "DMDW": 68, "Mobile Applications Development": 72, "Operating System": 66 }, status: "Pass" },
+        "230377401140": { name: "Karthikeya", subjects: { "AWS": 85, "Python": 82, "DMDW": 88, "Mobile Applications Development": 84, "Operating System": 86 }, status: "Pass" },
+        "230377401156": { name: "Satish", subjects: { "AWS": 92, "Python": 86, "DMDW": 88, "Mobile Applications Development": 90, "Operating System": 85 }, status: "Pass" },
+        "230377401194": { name: "Manikanta", subjects: { "AWS": 65, "Python": 60, "DMDW": 68, "Mobile Applications Development": 70, "Operating System": 64 }, status: "Pass" },
+        "230377401202": { name: "Shafiq", subjects: { "AWS": 70, "Python": 68, "DMDW": 75, "Mobile Applications Development": 72, "Operating System": 70 }, status: "Pass" },
+        "230377401206": { name: "Rajkumar", subjects: { "AWS": 82, "Python": 78, "DMDW": 80, "Mobile Applications Development": 85, "Operating System": 79 }, status: "Pass" },
+        "230377401213": { name: "Chaithanya", subjects: { "AWS": 50, "Python": 45, "DMDW": 55, "Mobile Applications Development": 70, "Operating System": 60 }, status: "Fail" },
+        "230377401234": { name: "Praveen", subjects: { "AWS": 88, "Python": 84, "DMDW": 80, "Mobile Applications Development": 90, "Operating System": 85 }, status: "Pass" },
+        "2303377401011": { name: "Prachothana", subjects: { "AWS": 88, "Python": 90, "DMDW": 86, "Mobile Applications Development": 89, "Operating System": 84 }, status: "Pass" },
+        "23139701041": { name: "Ajay", subjects: { "AWS": 90, "Python": 85, "DMDW": 88, "Mobile Applications Development": 86, "Operating System": 82 }, status: "Pass" },
+        "230377170220": { name: "Pavanendra", subjects: { "AWS": 78, "Python": 75, "DMDW": 80, "Mobile Applications Development": 82, "Operating System": 76 }, status: "Pass" }
+    };
+
+    function getGrade(marks) {
+        if (marks >= 90) return "O";
+        if (marks >= 80) return "A+";
+        if (marks >= 70) return "A";
+        if (marks >= 60) return "B+";
+        if (marks >= 50) return "B";
+        return "F";
+    }
+
+    function checkResult() {
+        const hallTicket = document.getElementById("hallTicket").value.trim();
+        const resultBox = document.getElementById("resultBox");
+
+        if (!hallTicket) {
+            alert("Please enter a hall ticket number!");
+            return;
+        }
+
+        if (studentData[hallTicket]) {
+            const student = studentData[hallTicket];
+            const subjects = student.subjects;
+
+            let tableHTML = `
+                <table>
+                    <tr><th>Subject</th><th>Grade</th></tr>
+            `;
+            for (let subject in subjects) {
+                const grade = getGrade(subjects[subject]);
+                const gradeClass = grade === "F" ? "fail" : (grade === "O" ? "pass" : "");
+                tableHTML += `<tr><td>${subject}</td><td class="${gradeClass}">${grade}</td></tr>`;
+            }
+            tableHTML += `</table>`;
+
+            resultBox.innerHTML = `
+                <h3>${student.name}</h3>
+                ${tableHTML}
+                <p class="${student.status === 'Pass' ? 'pass' : 'fail'}">
+                    Status: ${student.status}
+                </p>
+            `;
+            resultBox.style.display = "block";
+        } else {
+            resultBox.innerHTML = `<p style="color:red;">No record found for Hall Ticket: ${hallTicket}</p>`;
+            resultBox.style.display = "block";
+        }
+    }
+
+    document.getElementById("hallTicket").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            checkResult();
+        }
+    });
+</script>
+
+</body>
+</html>
