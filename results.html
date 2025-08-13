@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exam Results Portal</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f6f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            width: 380px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        table {
+            width: 100%;
+            margin-top: 10px;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .result-box {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f9f9f9;
+            display: none;
+            text-align: left;
+        }
+
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Check Exam Results</h2>
+        <input type="text" id="hallTicket" placeholder="Enter Hall Ticket Number">
+        <button onclick="checkResult()">Get Result</button>
+
+        <div class="result-box" id="resultBox"></div>
+    </div>
+
+    <script>
+        // Updated student results data
+        const studentData = {
+            "12345": { name: "VISWA", subjects: { "Cloud computing": 95, "Data science": 88, English: 92, Java: 85 }, status: "Pass" },
+            "67890": { name: "Vamsi", subjects: { "Cloud computing": 78, "Data science": 80, English: 75, Java: 85 }, status: "Pass" },
+            "54321": { name: "Chaitu", subjects: { "Cloud computing": 50, "Data science": 45, English: 55, Java: 70 }, status: "Fail" },
+            "98765": { name: "Varma", subjects: { "Cloud computing": 65, "Data science": 72, English: 68, Java: 80 }, status: "Pass" }
+        };
+
+        function checkResult() {
+            const hallTicket = document.getElementById("hallTicket").value.trim();
+            const resultBox = document.getElementById("resultBox");
+
+            if (!hallTicket) {
+                alert("Please enter a hall ticket number!");
+                return;
+            }
+
+            if (studentData[hallTicket]) {
+                const student = studentData[hallTicket];
+                const subjects = student.subjects;
+
+                // Calculate total marks and grade
+                let total = 0;
+                let maxMarks = Object.keys(subjects).length * 100;
+                for (let subject in subjects) {
+                    total += subjects[subject];
+                }
+                const percentage = (total / maxMarks) * 100;
+                let grade = percentage >= 85 ? "A" :
+                            percentage >= 70 ? "B" :
+                            percentage >= 50 ? "C" : "D";
+
+                // Create subject-wise marks table
+                let tableHTML = `
+                    <table>
+                        <tr><th>Subject</th><th>Marks</th></tr>
+                `;
+                for (let subject in subjects) {
+                    tableHTML += `<tr><td>${subject}</td><td>${subjects[subject]}</td></tr>`;
+                }
+                tableHTML += `</table>`;
+
+                // Display result
+                resultBox.innerHTML = `
+                    <h3>${student.name}</h3>
+                    ${tableHTML}
+                    <p><strong>Total Marks:</strong> ${total} / ${maxMarks}</p>
+                    <p><strong>Percentage:</strong> ${percentage.toFixed(2)}%</p>
+                    <p><strong>Grade:</strong> ${grade}</p>
+                    <p class="${student.status === 'Pass' ? 'pass' : 'fail'}">
+                        Status: ${student.status}
+                    </p>
+                `;
+                resultBox.style.display = "block";
+            } else {
+                resultBox.innerHTML = `<p style="color:red;">No record found for Hall Ticket: ${hallTicket}</p>`;
+                resultBox.style.display = "block";
+            }
+        }
+
+        // Allow pressing Enter to search
+        document.getElementById("hallTicket").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkResult();
+            }
+        });
+    </script>
+
+</body>
+</html>
